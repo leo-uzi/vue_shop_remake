@@ -12,7 +12,7 @@
        <el-aside :width="isCollapse?'64px':'200px'">
 <!--         左侧菜单组件-->
          <el-menu
-           default-active="2"
+           :default-active="activePath"
            class="menu"
            background-color="#323744"
            text-color="#fff"
@@ -29,7 +29,7 @@
                <i :class="fontClass[item.id]"></i>
                <span>{{item.authName}}</span>
              </template>
-               <el-menu-item :index="'/'+item2.path" v-for="item2 in item.children" :key="item2.id">
+               <el-menu-item :index="'/'+item2.path" v-for="item2 in item.children" :key="item2.id" @click="handleClickMenuitem('/'+item2.path)">
                  <template slot="title">
                    <i class="el-icon-menu"></i>
                    <span>{{item2.authName}}</span>
@@ -59,12 +59,15 @@ export default {
         145: 'iconfont icon-shujutongji'
       },
       // 菜单折叠状态
-      isCollapse: false
+      isCollapse: false,
+      // 激活选中的菜单项的内容
+      activePath: ''
     }
   },
   // 页面内容一生成便加载生命周期函数
   created () {
     this.getMenuList()
+    this.activePath = window.sessionStorage.getItem('activePath')
   },
   methods: {
     // 触发退出按钮事件
@@ -77,11 +80,16 @@ export default {
       const { data: res } = await this.$http.get('menus')
       if (res.meta.status !== 200) return this.$message.error('获取列表数据失败')
       this.menuList = res.data
-      console.log(this.menuList)
+      // console.log(this.menuList)
     },
     // 左侧菜单栏点击切换显示状态
     handleToggle () {
       this.isCollapse = !this.isCollapse
+    },
+    // 点击菜单项将路径值保存至storage中
+    handleClickMenuitem (path) {
+      window.sessionStorage.setItem('activePath', path)
+      this.activePath = path
     }
   }
 }
@@ -155,5 +163,7 @@ export default {
   span{
     font-size: 15px;
   }
+}
+.el-main{
 }
 </style>
